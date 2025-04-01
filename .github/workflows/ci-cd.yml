@@ -1,4 +1,4 @@
-namespace : ci-cd
+name : ci-cd
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 
+      - name: checkout
         uses: action/checkout@v4
       
       - name: Set up Node.js
