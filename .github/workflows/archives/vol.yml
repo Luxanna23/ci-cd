@@ -1,0 +1,36 @@
+name : vol
+
+on: push
+
+jobs:
+  policier-scene: 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: analyse scene de crime
+        run: echo "le policier examine la caisse"
+
+      - name: prelevement emprinte 
+        run: echo "emprintes prelevé"
+
+    outputs:
+      emprinte: "emprintes trouvé sur la caisse"
+
+  policier-vol:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: analyse scene de crime
+        run: echo "le policier examine la caisse"
+
+      - name: prelevement emprinte 
+        run: echo "emprintes prelevé"
+
+    outputs:
+      emprinte: "emprintes trouvé sur la caisse"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:

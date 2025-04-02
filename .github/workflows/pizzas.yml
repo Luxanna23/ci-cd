@@ -1,0 +1,71 @@
+name: pizzas
+
+on:
+  workflow_dispatch:
+    inputs:
+      nom_client:
+        description: "Nom du client"
+        required: true
+        type: string
+      pizzas:
+        description: "Liste des pizzas"
+        required: true
+        type: string
+
+jobs:
+  reception-commande:
+    runs-on: ubuntu-latest
+    outputs:
+      pizzas: ${{ steps.reception.outputs.pizzas }}
+    steps:
+      - name: message d'accueil
+        run: echo "Bienvenue a notre pizzeria , ${github.event.inputs.client_name}!"
+      
+      - name: Confirmer la réception de la commande
+        id: reception
+        run: |
+          echo "Commande reçue : ${github.event.inputs.client_name}."
+          echo "Les pizzas sont : ${{ github.event.inputs.pizzas }}."
+          echo "::set-output name=pizzas::${{ github.event.inputs.pizzas }}"
+
+  cuisine:
+    needs: reception-commande
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pizza: ${{ fromJSON(needs.reception-commande.outputs.pizzas) }}
+        taille: ["L", "XL"]
+        include:
+          - pizza: "pizza-dessert"
+    steps:
+      - name: Préparer la pizza
+        run: |
+          echo "Préparation de la pizza ${{ matrix.pizza }}, taille ${{ matrix.taille }}."
+
+
+  livraison:
+    needs: cuisine
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "livraison-${{ github.event.inputs.client_name }}"
+      cancel-in-progress: true
+    steps:
+      - name: la livraison
+        run: |
+          echo "préparation de la livraison : ${github.event.inputs.client_name}."
+          echo "pizzas à livrer : ${{ needs.cuisine.outputs.pizzas }}."
+
+
+  reclamation:
+    needs: livraison
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: commande gh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create --title "probleme" --body "probleme client: ${github.event.inputs.client_name}"

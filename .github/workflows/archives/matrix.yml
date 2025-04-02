@@ -1,0 +1,18 @@
+name: matrix
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  matrix-test:
+    runs-on:  ubuntu-latest
+    strategy:
+      max-parallel: 2
+      matrix-test:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [22,24]
+
+    steps:
+      - run: echo "running on ${{ matrix.os }} on node.js ${{ matrix.node-version }}"
